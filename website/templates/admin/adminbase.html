@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-gray-800 text-white flex-shrink-0">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 2a6 6 0 11-6 6 6 6 0 016-6zm0 8a2 2 0 112-2 2 2 0 01-2 2z"/>
+                </svg>
+                Admin Dashboard
+            </h2>
+            <nav>
+                <ul class="space-y-4">
+                    <!-- Admin Home -->
+                    <li>
+                        <a href="{% url 'adminhome' %}" 
+                           class="block px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                      d="M3 10h11M9 21v-7m-4 4l8-8m2-2a1 1 0 10-2-2l-4 4-2-2a1 1 0 10-2 2l4 4z" />
+                            </svg>
+                            Home
+                        </a>
+                    </li>
+    
+                    <!-- Manage Courses -->
+               
+                    <li>
+                        <a href="{% url 'add_course' %}" 
+                           class="block px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                      d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Course
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'course_list' %}" 
+                           class="block px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                      d="M3 4a1 1 0 011-1h14a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" />
+                            </svg>
+                            Course List
+                        </a>
+                    </li>
+    
+                    <!-- Bulk Upload -->
+                    <li>
+                        <a href="{% url 'bulk_register' %}" 
+                           class="block px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                      d="M9 12h6m2 0a2 2 0 11-4 0m-4 0a2 2 0 11-4 0m-2-8h16m-16 4h16m-16 4h8m-8 4h16" />
+                            </svg>
+                            Bulk Upload
+                        </a>
+                    </li>
+    
+                    <!-- Manage Users -->
+                    <li>
+                        <a href="{% url 'user_list' %}" 
+                           class="block px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                      d="M4 6h16M4 12h8m-8 6h16" />
+                            </svg>
+                            Manage Users
+                        </a>
+                    </li>
+    
+                    <!-- Logout -->
+                    <li>
+                        <a href="{% url 'logout' %}" 
+                           class="block px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                      d="M17 16l4-4m0 0l-4-4m4 4H3" />
+                            </svg>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+    
+
+    <!-- Content -->
+    <main class="flex-1 p-6 bg-gray-50 overflow-y-auto">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

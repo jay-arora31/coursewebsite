@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SkillIgnite{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css">
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.open {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="nav-blur fixed w-full z-50 py-4">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <a href="/" class="text-2xl font-bold gradient-text">SkillIgnite</a>
+                <div class="hidden md:flex items-center space-x-10">
+                    <a href="/" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Home</a>
+                 
+                    
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'courses' %}" class="text-gray-700 hover:text-blue-600 font-medium transition-colors hover:underline">My Courses</a>
+
+                    <div class="relative">
+                        <button onclick="toggleDropdown()" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600">
+                            <span class="font-medium">{{ user.username }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden">
+                            <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-blue-50">Profile</a>
+                            <a href="/settings" class="block px-4 py-2 text-gray-700 hover:bg-blue-50">Settings</a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <button onclick="openModal('loginModal')" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Login</button>
+                    <button onclick="openModal('registerModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-medium transition-colors">Register</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black opacity-50" onclick="closeModal('loginModal')"></div>
+            <div class="relative bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Welcome Back</h2>
+                    <button onclick="closeModal('loginModal')" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <form method="post" action="{% url 'login' %}" class="space-y-6">
+                    {% csrf_token %}
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" name="username" id="username" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" name="password" id="password" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember-me" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">Login</button>
+                </form>
+                <p class="mt-4 text-center text-sm text-gray-600">
+                    Don't have an account?
+                    <button onclick="openModal('registerModal')" class="font-medium text-blue-600 hover:text-blue-500">Register</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal fixed inset-0 z-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black opacity-50" onclick="closeModal('registerModal')"></div>
+            <div class="relative bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Create Account</h2>
+                    <button onclick="closeModal('registerModal')" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <form method="post" action="{% url 'register' %}" class="space-y-6">
+                    {% csrf_token %}
+                    <div>
+                        <label for="reg-username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" name="username" id="reg-username" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" id="email" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="reg-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" name="password1" id="reg-password" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="password-confirm" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                        <input type="password" name="password2" id="password-confirm" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">Create Account</button>
+                </form>
+                <p class="mt-4 text-center text-sm text-gray-600">
+                    Already have an account?
+                    <button onclick="openModal('loginModal')" class="font-medium text-blue-600 hover:text-blue-500">Login</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-20 pb-10 relative">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold gradient-text">SkillIgnite</h3>
+                    <p class="text-gray-400 leading-relaxed">Empowering the next generation of digital marketers with cutting-edge skills.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium text-gray-100">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-blue-600">Home</a></li>
+                        <li><a href="/courses" class="text-gray-400 hover:text-blue-600">Courses</a></li>
+                        <li><a href="/about" class="text-gray-400 hover:text-blue-600">About</a></li>
+                        <li><a href="/contact" class="text-gray-400 hover:text-blue-600">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium text-gray-100">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/about" class="text-gray-400 hover:text-blue-600">About Us</a></li>
+                        <li><a href="/careers" class="text-gray-400 hover:text-blue-600">Careers</a></li>
+                        <li><a href="/privacy" class="text-gray-400 hover:text-blue-600">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium text-gray-100">Follow Us</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-blue-600">Facebook</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-600">Instagram</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-600">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('open');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('open');
+        }
+    </script>
+</body>
+</html>

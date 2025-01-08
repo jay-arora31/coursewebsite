@@ -1,0 +1,79 @@
+/* Add these styles to your existing stylesheet or in a <style> tag */
+body {
+    font-family:  sans-serif;
+    background-color: #f8fafc;
+    width: 300px;
+}
+
+header {
+    background-color: #1E3A8A; /* Dark Blue */
+}
+
+.hero {
+    background-image: url('/path/to/your-hero-image.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-top: 1rem;
+    color: white;
+}
+
+button, .bg-yellow-500, .bg-blue-600 {
+    background-color: #F59E0B; /* Yellow for CTA buttons */
+}
+
+button:hover, .bg-yellow-400:hover, .bg-blue-500:hover {
+    background-color: #D97706;
+}
+
+footer {
+    background-color: #1E3A8A; /* Dark Blue */
+    text-align: center;
+    color: white;
+}
+
+footer a {
+    color: white;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #F59E0B;
+}
+
+.course {
+    transition: box-shadow 0.3s;
+}
+
+.course:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial p {
+    font-size: 1.125rem;
+    color: #4B5563;
+}
+
+.testimonial .text-gray-800 {
+    font-weight: bold;
+}

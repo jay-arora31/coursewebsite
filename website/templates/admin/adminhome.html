@@ -1,0 +1,77 @@
+{% extends 'admin/adminbase.html' %}
+
+{% block title %}Admin Home{% endblock %}
+
+{% block content %}
+<header class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-extrabold text-gray-800">Welcome, Admin</h1>
+    <a href="{% url 'add_course' %}" 
+       class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-500 flex items-center">
+        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" 
+                  d="M12 4v16m8-8H4" />
+        </svg>
+        Add New Course
+    </a>
+</header>
+
+<!-- Dashboard Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Card 1 -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-semibold text-gray-700">Total Users</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">123</p>
+        <a href="{% url 'user_list' %}" 
+           class="text-blue-600 mt-2 inline-block hover:underline">
+            View All Users
+        </a>
+    </div>
+  
+    <!-- Card 2 -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-semibold text-gray-700">Active Sessions</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">45</p>
+        <a href="#" 
+           class="text-blue-600 mt-2 inline-block hover:underline">
+            Manage Sessions
+        </a>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-semibold text-gray-700">Pending Requests</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">7</p>
+        <a href="#" 
+           class="text-blue-600 mt-2 inline-block hover:underline">
+            View Requests
+        </a>
+    </div>
+</section>
+
+<!-- Additional Admin Actions -->
+<section class="mt-10">
+    <h2 class="text-xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="{% url 'bulk_register' %}" 
+           class="bg-green-600 text-white px-4 py-3 rounded-lg shadow hover:bg-green-500 flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" 
+                      d="M3 10h11M9 21v-7m-4 4l8-8m2-2a1 1 0 10-2-2l-4 4-2-2a1 1 0 10-2 2l4 4z" />
+            </svg>
+            Bulk Register Users
+        </a>
+
+        <a href="{% url 'course_list' %}" 
+           class="bg-purple-600 text-white px-4 py-3 rounded-lg shadow hover:bg-purple-500 flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" 
+                      d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+            Manage Courses
+        </a>
+    </div>
+</section>
+{% endblock %}

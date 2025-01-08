@@ -1,0 +1,31 @@
+{% extends "admin/adminbase.html" %}
+
+{% block title %}Course List{% endblock %}
+
+{% block content %}
+<div class="course-list">
+    <h1 class="text-3xl font-bold mb-6">Available Courses</h1>
+
+    {% if courses %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in courses %}
+                <div class="course bg-white rounded-lg shadow p-4">
+                    <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="rounded-lg mb-4">
+                    <h2 class="text-xl font-semibold">{{ course.title }}</h2>
+                    <p class="text-gray-700">{{ course.description|truncatewords:20 }}</p>
+                    <a href="{% url 'course_detail' course.id %}" 
+                       class="text-blue-600 hover:underline mt-2 block">
+                        View Details
+                    </a>
+                    <a href="{% url 'edit_course' course.id %}" 
+                    class="text-blue-600 hover:underline mt-2 block">
+                     Edit Details
+                 </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No courses available at the moment. Please check back later.</p>
+    {% endif %}
+</div>
+{% endblock %}
