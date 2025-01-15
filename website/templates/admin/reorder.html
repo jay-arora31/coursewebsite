@@ -1,0 +1,57 @@
+{% extends 'admin/adminbase.html' %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Reorder Submodules and Videos for {{ course.name }}</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Submodule Sorting -->
+        <ul id="submodule-list" class="list-group sortable">
+            {% for submodule in submodules %}
+            <li class="list-group-item p-3 mb-3 shadow-sm bg-light" data-id="{{ submodule.id }}">
+                <strong>{{ submodule.title }}</strong>
+                <input type="hidden" name="submodule_order[]" value="{{ submodule.id }}">
+
+                <!-- Video Sorting -->
+                <ul class="sortable list-group mt-3 video-list" id="video-list-{{ submodule.id }}">
+                    {% for video in submodule.videos.all %}
+                    <li class="list-group-item p-2 bg-white border" data-id="{{ video.id }}">
+                        {{ video.title }}
+                        <input type="hidden" name="video_order_{{ submodule.id }}[]" value="{{ video.id }}">
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <button type="submit" class="btn btn-success btn-lg d-block mx-auto mt-4">Save Order</button>
+    </form>
+</div>
+
+<!-- jQuery and jQuery UI included from base.html -->
+<script>
+    $(document).ready(function() {
+        $("#submodule-list").sortable({
+            update: function(event, ui) {
+                $("#submodule-list li").each(function(index) {
+                    $(this).find("input[name='submodule_order[]']").val($(this).data("id"));
+                });
+            }
+        });
+
+        $(".video-list").sortable({
+            connectWith: ".video-list",
+            update: function(event, ui) {
+                $(this).find("li").each(function(index) {
+                    $(this).find("input").val($(this).data("id"));
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

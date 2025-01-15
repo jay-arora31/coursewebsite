@@ -11,15 +11,21 @@ urlpatterns = [
     path(
         "list/", course_list, name="course_list"
     ),  # URL to list all courses (if needed)
-        path('courses/', courses, name='courses'),
-
+    path("courses/", courses, name="courses"),
     path("courses/<int:course_id>/", course_detail, name="course_detail"),
     path("course-detail/<int:course_id>/", course_normal_detail, name="course_details"),
     path("courseedit/<int:course_id>/", edit_course, name="edit_course"),
-        path('bulk-upload/', bulk_register, name='bulk_register'),
-    path('users/', user_list, name='user_list'),
-    path('users/edit/<int:user_id>/', edit_user, name='edit_user'),
-    path('users/delete/<int:user_id>/', delete_user, name='delete_user'),
+    path("reorder_submodule_video/<int:course_id>/", reorder_submodule_video, name="reorder_submodule_video"),
+    path("bulk-upload/", bulk_register, name="bulk_register"),
+    path("users/", user_list, name="user_list"),
+    path("users/edit/<int:user_id>/", edit_user, name="edit_user"),
+    path("users/delete/<int:user_id>/", delete_user, name="delete_user"),
+    path(
+        "submodule/<int:submodule_id>/delete/",
+        delete_submodule,
+        name="delete_submodule",
+    ),
+    path("video/<int:video_id>/delete/", delete_video, name="delete_video"),
 ]
 
 from django.conf.urls import handler404

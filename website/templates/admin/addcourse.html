@@ -7,15 +7,7 @@
     <h1 class="text-2xl font-bold mb-6">Add Course</h1>
 
     <!-- Display success messages -->
-    {% if messages %}
-        <div class="mb-6">
-            {% for message in messages %}
-                <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+
 
     <form action="{% url 'add_course' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}

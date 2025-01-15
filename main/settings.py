@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-i4xclnzi7k2so@^iw(c09o&d2k@*j2!==lx1_-vsbize8ud31s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','13.60.200.78','courses.skillignite.in']
+ALLOWED_HOSTS = ['*','145.223.23.142','courses.skillignite.in']
 
 
 # Application definition
@@ -120,6 +120,7 @@ LOGOUT_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 # settings.py
+CORS_ALLOW_ALL_ORIGINS = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [

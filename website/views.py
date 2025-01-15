@@ -1,9 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponseForbidden, JsonResponse
+from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 from .forms import RegisterForm
+from .models import Course, Submodule, Video
+import csv
+import random
+import string
 
+def is_superuser(user):
+    return user.is_superuser
 
 def register_view(request):
     if request.method == "POST":
@@ -16,17 +27,10 @@ def register_view(request):
         form = RegisterForm()
     return render(request, "register.html", {"form": form})
 
-
-from django.http import HttpResponseForbidden
-
-
 @login_required
+@user_passes_test(is_superuser)
 def admin_home_view(request):
-    if request.user.is_superuser:
-        return render(request, "admin/adminhome.html", {"user": request.user})
-    else:
-        return HttpResponseForbidden("You are not authorized to view this page.")
-
+    return render(request, "admin/adminhome.html", {"user": request.user})
 
 def login_view(request):
     if request.method == "POST":
@@ -43,10 +47,8 @@ def login_view(request):
             messages.error(request, "Invalid username or password")
     return render(request, "home.html", {"user": request.user})
 
-
 def home_view(request):
     return render(request, "home.html", {"user": request.user})
-
 
 @login_required
 def logout_view(request):
@@ -54,27 +56,21 @@ def logout_view(request):
     messages.success(request, "You have been logged out.")
     return redirect("login")
 
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Course, Submodule, Video
-
-
-# List all courses
+@login_required
+@user_passes_test(is_superuser)
 def course_list(request):
     courses = Course.objects.all()
     return render(request, "admin/courselist.html", {"courses": courses})
 
-
-# List all courses
+@login_required
 def courses(request):
     courses = Course.objects.all()
     return render(request, "course_list.html", {"courses": courses})
 
-
+@login_required(login_url='/login/')
 def course_normal_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     submodules = course.submodules.all().prefetch_related("videos")
-    print(submodules)
     return render(
         request,
         "course_details.html",
@@ -84,278 +80,175 @@ def course_normal_detail(request, course_id):
         },
     )
 
-
-# View course details including submodules and videos
-def course_detail(request, pk):
-    course = get_object_or_404(Course, pk=pk)
-    submodules = course.submodules.all()  # Related submodules
-    return render(
-        request, "admin/coursedetail.html", {"course": course, "submodules": submodules}
-    )
-
-
-from django.shortcuts import render, redirect
-from .models import Course, Submodule, Video
-
-
-def add_course(request):
-    if request.method == "POST":
-        try:
-            # Basic validation
-            title = request.POST.get("title")
-            description = request.POST.get("description")
-            thumbnail = request.FILES.get("thumbnail")
-            print(title)
-            if not title or not description or not thumbnail:
-                messages.error(request, "All course fields are required.")
-                return render(
-                    request,
-                    "admin/addcourse.html",
-                    {"error": "All course fields are required."},
-                )
-
-            # Create course
-            course = Course.objects.create(
-                title=title, description=description, thumbnail=thumbnail
-            )
-            messages.success(request, "Course created successfully!")
-            return redirect("course_list")
-
-        except Exception as e:
-            messages.error(request, f"An error occurred: {str(e)}")
-            return render(
-                request,
-                "admin/addcourse.html",
-                {"error": f"An error occurred: {str(e)}"},
-            )
-
-    return render(request, "admin/addcourse.html")
-
-
-def course_list(request):
-    # Fetch all courses
-    courses = Course.objects.all()
-
-    # Render the course list page
-    return render(
-        request,
-        "admin/courselist.html",
-        {
-            "courses": courses,
-        },
-    )
-
-
+@login_required(login_url='/login/')
+@user_passes_test(is_superuser)
 def course_detail(request, course_id):
-    course = Course.objects.get(id=course_id)  # Fetch the course by id
-    submodules = Submodule.objects.filter(course=course)  # Get related submodules
-
-    # Loop through submodules and assign related videos
+    course = Course.objects.get(id=course_id)
+    submodules = Submodule.objects.filter(course=course)
     for submodule in submodules:
-        submodule.videos.set(
-            Video.objects.filter(submodule=submodule)
-        )  # Use set() method for ManyToMany relationship
-
+        submodule.videos.set(Video.objects.filter(submodule=submodule))
     context = {
         "course": course,
         "submodules": submodules,
     }
-
     return render(request, "admin/coursedetails.html", context)
 
+@login_required
+@user_passes_test(is_superuser)
+def add_course(request):
+    if request.method == "POST":
+        try:
+            title = request.POST.get("title")
+            description = request.POST.get("description")
+            thumbnail = request.FILES.get("thumbnail")
+            if not title or not description or not thumbnail:
+                messages.error(request, "All course fields are required.")
+                return render(request, "admin/addcourse.html", {"error": "All course fields are required."})
+            course = Course.objects.create(title=title, description=description, thumbnail=thumbnail)
+            messages.success(request, "Course created successfully!")
+            return redirect("course_list")
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+            return render(request, "admin/addcourse.html", {"error": f"An error occurred: {str(e)}"})
+    return render(request, "admin/addcourse.html")
 
+@login_required
+@user_passes_test(is_superuser)
 def edit_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-
     if request.method == "POST":
-        # Update course details
         course.title = request.POST.get("title")
         course.description = request.POST.get("description")
         if request.FILES.get("thumbnail"):
             course.thumbnail = request.FILES.get("thumbnail")
         course.save()
-
-        # Handle existing submodules
         submodule_ids = request.POST.getlist("submodule_ids[]")
         submodule_titles = request.POST.getlist("submodule_titles[]")
         submodule_descriptions = request.POST.getlist("submodule_descriptions[]")
-
         for idx, submodule_id in enumerate(submodule_ids):
             try:
                 submodule = Submodule.objects.get(id=submodule_id)
                 submodule.title = submodule_titles[idx]
                 submodule.description = submodule_descriptions[idx]
                 submodule.save()
-
-                # Update associated videos
                 video_ids = request.POST.getlist(f"video_ids_{submodule_id}[]")
                 video_titles = request.POST.getlist(f"video_titles_{submodule_id}[]")
                 video_urls = request.POST.getlist(f"video_urls_{submodule_id}[]")
-                video_durations = request.POST.getlist(
-                    f"video_durations_{submodule_id}[]"
-                )
-
+                video_durations = request.POST.getlist(f"video_durations_{submodule_id}[]")
                 for vid_idx, video_id in enumerate(video_ids):
-                    try:
-                        video = Video.objects.get(id=video_id)
-                        video.title = video_titles[vid_idx]
-                        video.video_url = video_urls[vid_idx]
-                        video.duration = (
-                            int(video_durations[vid_idx])
-                            if video_durations[vid_idx]
-                            else 0
+                    if video_id:
+                        try:
+                            video = Video.objects.get(id=video_id)
+                            video.title = video_titles[vid_idx]
+                            video.video_url = video_urls[vid_idx]
+                            video.duration = int(video_durations[vid_idx]) if video_durations[vid_idx] else 0
+                            video.save()
+                        except Video.DoesNotExist:
+                            continue
+                    else:
+                        Video.objects.create(
+                            submodule=submodule,
+                            title=video_titles[vid_idx],
+                            video_url=video_urls[vid_idx],
+                            duration=int(video_durations[vid_idx]) if video_durations[vid_idx] else 0
                         )
-                        video.save()
-                    except Video.DoesNotExist:
-                        continue
-
             except Submodule.DoesNotExist:
                 continue
-
-        # Handle new submodules and their videos
         new_submodule_titles = request.POST.getlist("new_submodule_titles[]")
-        new_submodule_descriptions = request.POST.getlist(
-            "new_submodule_descriptions[]"
-        )
+        new_submodule_descriptions = request.POST.getlist("new_submodule_descriptions[]")
+        new_submodule_map = {}
+        for idx, title in enumerate(new_submodule_titles):
+            if title.strip() and new_submodule_descriptions[idx].strip():
+                new_submodule = Submodule.objects.create(
+                    course=course,
+                    title=title,
+                    description=new_submodule_descriptions[idx]
+                )
+                new_submodule_map[f'new-{idx}'] = new_submodule
         new_video_titles = request.POST.getlist("new_video_titles[]")
         new_video_urls = request.POST.getlist("new_video_urls[]")
         new_video_durations = request.POST.getlist("new_video_durations[]")
         new_video_submodule_ids = request.POST.getlist("new_video_submodule_ids[]")
-
-        new_submodules = []
-        for idx in range(len(new_submodule_titles)):
-            if (
-                new_submodule_titles[idx].strip()
-                and new_submodule_descriptions[idx].strip()
-            ):
-                new_submodule = Submodule.objects.create(
-                    course=course,
-                    title=new_submodule_titles[idx],
-                    description=new_submodule_descriptions[idx],
-                )
-                new_submodules.append(new_submodule)
-
-        for idx in range(len(new_video_titles)):
-            if new_video_titles[idx].strip() and new_video_urls[idx].strip():
-                try:
-                    submodule_id = new_video_submodule_ids[idx]
-                    if submodule_id:
-                        submodule = Submodule.objects.get(id=submodule_id)
-                    else:
-                        submodule = (
-                            new_submodules[idx // 3]
-                            if idx // 3 < len(new_submodules)
-                            else None
-                        )
-
-                    if submodule:
-                        Video.objects.create(
-                            submodule=submodule,
-                            title=new_video_titles[idx],
-                            video_url=new_video_urls[idx],
-                            duration=(
-                                int(new_video_durations[idx])
-                                if new_video_durations[idx]
-                                else 0
-                            ),
-                        )
-                except (Submodule.DoesNotExist, IndexError):
-                    continue
-
+        for idx, title in enumerate(new_video_titles):
+            if title.strip() and new_video_urls[idx].strip():
+                submodule_id = new_video_submodule_ids[idx]
+                if submodule_id.startswith('new-') and submodule_id in new_submodule_map:
+                    submodule = new_submodule_map[submodule_id]
+                    Video.objects.create(
+                        submodule=submodule,
+                        title=title,
+                        video_url=new_video_urls[idx],
+                        duration=int(new_video_durations[idx]) if new_video_durations[idx] else 0
+                    )
         return redirect("course_detail", course_id=course.id)
-
     submodules = Submodule.objects.filter(course=course)
-    return render(
-        request, "admin/editcourse.html", {"course": course, "submodules": submodules}
-    )
+    return render(request, "admin/editcourse.html", {"course": course, "submodules": submodules})
 
+import hashlib
 
-import csv
-import random
-import string
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.shortcuts import render, redirect
-from django.contrib import messages
-
-
-def generate_random_password(length=8):
-    """Generate a random password."""
-    characters = string.ascii_letters + string.digits + string.punctuation
-    return "".join(random.choices(characters, k=length))
-
+def generate_password_based_on_email(email, length=8):
+    # Create a hash of the email
+    hash_object = hashlib.md5(email.encode())
+    hashed_email = hash_object.hexdigest()
+    
+    # Take the first 'length' characters from the hashed email
+    password = hashed_email[:length]
+    
+    return password
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
+import csv
 
-
+@login_required
+@user_passes_test(is_superuser)
 def bulk_register(request):
     if request.method == "POST" and request.FILES["csv_file"]:
         csv_file = request.FILES["csv_file"]
         decoded_file = csv_file.read().decode("utf-8").splitlines()
         reader = csv.DictReader(decoded_file)
-
         errors = []
         for row in reader:
-            username = row.get("Username")
-            email = row.get("Email")
-
+            username = row.get("email")
+            email = row.get("email")
             if not username or not email:
                 errors.append(f"Missing data for user: {row}")
                 continue
-
-            # Generate a random password
-            password = generate_random_password()
-
+            password = generate_password_based_on_email(email)
             try:
-                # Create user
-                user = User.objects.create_user(
-                    username=username, email=email, password=password
-                )
-
-                # Render HTML email
-                html_content = render_to_string(
-                    "email_template.html", {"username": username, "password": password}
-                )
-
-                # Send email with credentials
+                user = User.objects.create_user(username=username, email=email, password=password)
+                # Customize the email content
+                html_content = render_to_string("email_template.html", {"username": username, "password": password})
                 send_mail(
                     subject="Your Account Credentials",
-                    message="This is an HTML email. Please use a compatible email client.",
+                    message="Please use a compatible email client to view your credentials.",
                     from_email="jayarora3100@gmail.com",
                     recipient_list=[email],
                     html_message=html_content,
                 )
             except Exception as e:
                 errors.append(f"Error creating user {username}: {e}")
-
         if errors:
             messages.error(request, f"Some errors occurred: {errors}")
         else:
-            messages.success(
-                request, "Users registered successfully, and emails have been sent!"
-            )
-
+            messages.success(request, "Users registered successfully, and emails have been sent!")
         return redirect("bulk_register")
-
     return render(request, "admin/bulk_register.html")
 
-
-from django.contrib.auth.models import User
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-
-
+@login_required
+@user_passes_test(is_superuser)
 def user_list(request):
-    """Display a list of users with options to edit or delete."""
     users = User.objects.all()
     return render(request, "admin/user_list.html", {"users": users})
 
-
+@login_required
+@user_passes_test(is_superuser)
 def edit_user(request, user_id):
-    """Edit user details."""
     user = get_object_or_404(User, id=user_id)
-
     if request.method == "POST":
         user.username = request.POST.get("username")
         user.email = request.POST.get("email")
@@ -364,20 +257,77 @@ def edit_user(request, user_id):
         user.save()
         messages.success(request, f"User {user.username} updated successfully!")
         return redirect("user_list")
-
     return render(request, "admin/edit_user.html", {"user": user})
 
-
+@login_required
+@user_passes_test(is_superuser)
 def delete_user(request, user_id):
-    """Delete a user."""
     user = get_object_or_404(User, id=user_id)
     user.delete()
     messages.success(request, f"User {user.username} deleted successfully!")
     return redirect("user_list")
 
-
-from django.shortcuts import render
-
-
 def custom_404_view(request, exception):
     return render(request, "404.html", status=404)
+
+@require_POST
+@login_required
+@user_passes_test(is_superuser)
+def delete_submodule(request, submodule_id):
+    try:
+        submodule = get_object_or_404(Submodule, id=submodule_id)
+        course_id = submodule.course.id
+        submodule.delete()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Submodule deleted successfully',
+            'course_id': course_id
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
+
+@require_POST
+@login_required
+@user_passes_test(is_superuser)
+def delete_video(request, video_id):
+    try:
+        video = get_object_or_404(Video, id=video_id)
+        submodule_id = video.submodule.id
+        video.delete()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Video deleted successfully',
+            'submodule_id': submodule_id
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
+
+@login_required
+@user_passes_test(is_superuser)
+def reorder_submodule_video(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if request.method == "POST":
+        try:
+            submodule_order = request.POST.getlist("submodule_order[]")
+            for index, submodule_id in enumerate(submodule_order):
+                submodule = Submodule.objects.get(id=submodule_id, course=course)
+                submodule.order = index
+                submodule.save()
+            for submodule in course.submodules.all():
+                video_order = request.POST.getlist(f"video_order_{submodule.id}[]")
+                for index, video_id in enumerate(video_order):
+                    video = Video.objects.get(id=video_id, submodule=submodule)
+                    video.order = index
+                    video.save()
+            messages.success(request, "Order updated successfully!")
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+        return redirect("course_detail", course_id=course.id)
+    submodules = Submodule.objects.filter(course=course).order_by("order")
+    return render(request, "admin/reorder.html", {"course": course, "submodules": submodules})
