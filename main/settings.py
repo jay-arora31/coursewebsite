@@ -27,7 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*','145.223.23.142','courses.skillignite.in']
 CSRF_TRUSTED_ORIGINS = [
-'145.223.23.142','courses.skillignite.in'
+    'http://145.223.23.142',
+    'https://145.223.23.142',
+    'http://courses.skillignite.in',
+    'https://courses.skillignite.in',
 ]
 
 
