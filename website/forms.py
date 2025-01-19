@@ -10,5 +10,7 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 from django import forms
 
+
+
 class BulkUserUploadForm(forms.Form):
     csv_file = forms.FileField(label="Upload CSV")
