@@ -25,12 +25,12 @@ SECRET_KEY = 'django-insecure-i4xclnzi7k2so@^iw(c09o&d2k@*j2!==lx1_-vsbize8ud31s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','145.223.23.142','courses.skillignite.in']
+ALLOWED_HOSTS = ['*','145.223.23.142','jayarora.xyz']
 CSRF_TRUSTED_ORIGINS = [
     'http://145.223.23.142',
     'https://145.223.23.142',
-    'http://courses.skillignite.in',
-    'https://courses.skillignite.in',
+    'http://jayarora.xyz',
+    'https://jayarora.xyz',
 ]
 
 
