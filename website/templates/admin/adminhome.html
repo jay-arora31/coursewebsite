@@ -20,32 +20,35 @@
 <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
     <!-- Card 1 -->
     <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-        <h3 class="text-lg font-semibold text-gray-700">Total Users</h3>
-        <p class="text-4xl font-extrabold text-gray-900 mt-3">123</p>
-        <a href="{% url 'user_list' %}" 
+        <h3 class="text-lg font-semibold text-gray-700">Total Courses</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">{{ total_courses }}</p>
+        <a href="{% url 'course_list' %}" 
            class="text-blue-600 mt-2 inline-block hover:underline">
-            View All Users
+            View All Courses
         </a>
     </div>
   
     <!-- Card 2 -->
     <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-        <h3 class="text-lg font-semibold text-gray-700">Active Sessions</h3>
-        <p class="text-4xl font-extrabold text-gray-900 mt-3">45</p>
-        <a href="#" 
+        <h3 class="text-lg font-semibold text-gray-700">Total Users</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">{{ total_users }}</p>
+        <a href="{% url 'user_list' %}" 
            class="text-blue-600 mt-2 inline-block hover:underline">
-            Manage Sessions
+            View All Users
         </a>
     </div>
 
     <!-- Card 3 -->
     <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-        <h3 class="text-lg font-semibold text-gray-700">Pending Requests</h3>
-        <p class="text-4xl font-extrabold text-gray-900 mt-3">7</p>
-        <a href="#" 
-           class="text-blue-600 mt-2 inline-block hover:underline">
-            View Requests
-        </a>
+        <h3 class="text-lg font-semibold text-gray-700">Total Videos</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">{{ total_videos }}</p>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-semibold text-gray-700">Total Submodules</h3>
+        <p class="text-4xl font-extrabold text-gray-900 mt-3">{{ total_submodules }}</p>
+       
     </div>
 </section>
 

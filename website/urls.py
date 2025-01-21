@@ -11,6 +11,8 @@ urlpatterns = [
     path(
         "list/", course_list, name="course_list"
     ),  # URL to list all courses (if needed)
+        path("delete_course/<int:course_id>/", delete_course, name="delete_course"),
+
     path("courses/", courses, name="courses"),
     path("courses/<int:course_id>/", course_detail, name="course_detail"),
     path("course-detail/<int:course_id>/", course_normal_detail, name="course_details"),

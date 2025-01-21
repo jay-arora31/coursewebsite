@@ -29,9 +29,27 @@ def register_view(request):
 
 @login_required
 @user_passes_test(is_superuser)
+def delete_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    course_title = course.title
+    course.delete()
+    messages.success(request, f"The course '{course_title}' has been successfully deleted.")
+    return redirect('course_list')
+@login_required
+@user_passes_test(is_superuser)
 def admin_home_view(request):
-    return render(request, "admin/adminhome.html", {"user": request.user})
+    total_courses = Course.objects.count()
+    total_users = User.objects.count()
+    total_videos = Video.objects.count()
+    total_submodules = Submodule.objects.count()
 
+    context = {
+        "total_courses": total_courses,
+        "total_users": total_users,
+        "total_videos": total_videos,
+        "total_submodules": total_submodules,
+    }
+    return render(request, "admin/adminhome.html", context)
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
