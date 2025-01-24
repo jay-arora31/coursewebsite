@@ -89,6 +89,29 @@ SkillIgnite{% endblock %} {% block content %}
           </p>
 
           <!-- Enhanced CTA Buttons -->
+          {% if user.is_authenticated %}
+
+          <div class="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+            <a
+            href="{% url 'courses' %}"
+            class="group relative inline-flex items-center justify-center px-8 py-4 bg-white rounded-full text-lg font-semibold text-indigo-600 hover:text-indigo-700 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-1"          >
+            Start Learning
+            <svg
+              class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              ></path>
+            </svg>
+          </a>
+        </div>
+        {% else %}
           <div class="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <a
             href="javascript:void(0);"
@@ -112,7 +135,7 @@ SkillIgnite{% endblock %} {% block content %}
           </a>
             
           </div>
-
+{% endif %}
           <!-- Enhanced Stats Section -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto px-4">
             <!-- Card 1 -->

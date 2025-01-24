@@ -112,7 +112,6 @@
                                             <div class="flex items-center gap-3 mt-1">
                                                 <span class="text-sm text-gray-500">{{ video.duration }}</span>
                                                 <!-- Status badge (optional) -->
-                                                <span class="px-2 py-0.5 text-xs font-medium bg-green-50 text-green-600 rounded-full">Completed</span>
                                             </div>
                                         </div>
                                     </div>
@@ -207,6 +206,22 @@ function loadWistiaVideo(videoId, title, description) {
         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const firstModule = document.querySelector('.course-module');
+    if (firstModule) {
+        const firstVideo = firstModule.querySelector('button[onclick^="loadWistiaVideo"]');
+        if (firstVideo) {
+            // Programmatically trigger the first video's click event
+            firstVideo.click();
+            
+            // Also automatically expand the first module
+            const moduleToggleButton = firstModule.querySelector('button[onclick^="toggleModule"]');
+            if (moduleToggleButton) {
+                moduleToggleButton.click();
+            }
+        }
+    }
+});
 </script>
 
 <script src="https://fast.wistia.com/player.js" async></script>
