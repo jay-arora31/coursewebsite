@@ -28,6 +28,8 @@ urlpatterns = [
         name="delete_submodule",
     ),
     path("video/<int:video_id>/delete/", delete_video, name="delete_video"),
+        path('change-password/', change_password, name='change_password'),
+
 ]
 
 from django.conf.urls import handler404

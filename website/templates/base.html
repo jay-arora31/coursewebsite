@@ -29,7 +29,88 @@
   </head>
   <body class="bg-gray-50">
     <!-- Navigation -->
+ 
+
     <nav class="absolute w-full py-4 bg-[rgba(255,255,255,0.8)]  z-20">
+      {% if messages %}
+      <div class="fixed top-4 right-4 z-50 space-y-4">
+          {% for message in messages %}
+              <div class="
+                  {% if message.tags == 'success' %}
+                      bg-gradient-to-r from-green-400 to-green-600 text-white
+                  {% elif message.tags == 'error' %}
+                      bg-gradient-to-r from-red-400 to-red-600 text-white
+                  {% elif message.tags == 'warning' %}
+                      bg-gradient-to-r from-yellow-400 to-yellow-600 text-white
+                  {% else %}
+                      bg-gradient-to-r from-blue-400 to-blue-600 text-white
+                  {% endif %}
+                  
+                  transform transition-all duration-300 ease-in-out 
+                  hover:scale-105 hover:shadow-2xl
+                  px-6 py-4 
+                  rounded-xl 
+                  shadow-lg 
+                  relative 
+                  overflow-hidden
+                  animate-slide-in-right"
+              >
+                  <div class="relative z-10 flex items-center">
+                      {% if message.tags == 'success' %}
+                          <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                      {% elif message.tags == 'error' %}
+                          <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                      {% endif %}
+                      
+                      <span class="font-medium">{{ message }}</span>
+                  </div>
+                  
+                  <button 
+                      onclick="this.parentElement.remove()"
+                      class="absolute top-2 right-2 text-white opacity-70 hover:opacity-100 transition-opacity"
+                  >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                  </button>
+              </div>
+          {% endfor %}
+      </div>
+  {% endif %}
+  
+  <style>
+  @keyframes slide-in-right {
+      from {
+          opacity: 0;
+          transform: translateX(100%);
+      }
+      to {
+          opacity: 1;
+          transform: translateX(0);
+      }
+  }
+  
+  .animate-slide-in-right {
+      animation: slide-in-right 0.5s ease-out;
+  }
+  </style>
+  
+  <script>
+  // Auto-dismiss messages after 5 seconds
+  document.addEventListener('DOMContentLoaded', () => {
+      const messages = document.querySelectorAll('.animate-slide-in-right');
+      messages.forEach(message => {
+          setTimeout(() => {
+              message.classList.add('opacity-0', 'translate-x-full');
+              setTimeout(() => message.remove(), 500);
+          }, 5000);
+      });
+  });
+  </script>
         <div class="container mx-auto px-6">
           <div class="flex items-center justify-between">
             <!-- Logo -->
@@ -69,6 +150,7 @@
                 class="text-gray-200 hover:text-blue-300 font-medium transition-colors"
                 >Home</a
               >
+            
               <a
                 href="{% url 'courses' %}"
                 class="text-gray-200 hover:text-blue-300 font-medium transition-colors"
@@ -81,7 +163,7 @@
                   onclick="toggleDropdown()"
                   class="flex items-center space-x-2 text-gray-200 hover:text-blue-300"
                 >
-                  <span class="font-medium">{{ user.username }}</span>
+                  <span class="font-medium">{{ user.first_name }}</span>
                   <svg
                     class="w-4 h-4"
                     xmlns="http://www.w3.org/2000/svg"
@@ -101,6 +183,102 @@
                   id="dropdown"
                   class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden"
                 >
+                <!-- Add this inside the dropdown menu for authenticated users, just before the logout form -->
+<button
+onclick="openModal('changePasswordModal')"
+class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50"
+>
+Change Password
+</button>
+
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="modal fixed inset-0 z-50">
+<div class="flex items-center justify-center min-h-screen px-4">
+  <div
+    class="fixed inset-0 bg-black opacity-50"
+    onclick="closeModal('changePasswordModal')"
+  ></div>
+  <div
+    class="relative bg-white rounded-xl shadow-2xl p-8 w-full max-w-md"
+  >
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Change Password</h2>
+      <button
+        onclick="closeModal('changePasswordModal')"
+        class="text-gray-400 hover:text-gray-500"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+    <form method="post" action="{% url 'change_password' %}" class="space-y-6">
+      {% csrf_token %}
+      <div>
+        <label
+          for="current-password"
+          class="block text-sm font-medium text-gray-700"
+        >
+          Current Password
+        </label>
+        <input
+          type="password"
+          name="current_password"
+          id="current-password"
+          required
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label
+          for="new-password"
+          class="block text-sm font-medium text-gray-700"
+        >
+          New Password
+        </label>
+        <input
+          type="password"
+          name="new_password1"
+          id="new-password"
+          required
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label
+          for="confirm-new-password"
+          class="block text-sm font-medium text-gray-700"
+        >
+          Confirm New Password
+        </label>
+        <input
+          type="password"
+          name="new_password2"
+          id="confirm-new-password"
+          required
+          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
+      >
+        Change Password
+      </button>
+    </form>
+  </div>
+</div>
+</div>
                 
                   <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
@@ -127,7 +305,7 @@
           <!-- Mobile Menu -->
           <nav
   id="mobile-menu"
-  class="hidden bg-white p-6 text-black shadow-md rounded-md"
+  class="hidden bg-white p-3 text-black shadow-md rounded-md"
   role="navigation"
   aria-label="Mobile Menu"
 >
@@ -157,7 +335,7 @@
   {% else %}
   <button
     onclick="openModal('loginModal')"
-    class="block w-full py-2 px-4 text-gray-800 hover:bg-blue-100 rounded-md font-medium transition-all"
+    class="block text-gray-800 hover:bg-blue-100 rounded-md font-medium transition-all"
   >
     Login
   </button>
@@ -356,11 +534,10 @@
               type="submit"
               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
             >
-              Create Account
-            </button>
+
+          </button>
           </form>
           <p class="mt-4 text-center text-sm text-gray-600">
-            Already have an account?
             <button
               onclick="openModal('loginModal')"
               class="font-medium text-blue-600 hover:text-blue-500"

@@ -35,6 +35,7 @@ def delete_course(request, course_id):
     course.delete()
     messages.success(request, f"The course '{course_title}' has been successfully deleted.")
     return redirect('course_list')
+
 @login_required
 @user_passes_test(is_superuser)
 def admin_home_view(request):
@@ -50,6 +51,8 @@ def admin_home_view(request):
         "total_submodules": total_submodules,
     }
     return render(request, "admin/adminhome.html", context)
+
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -231,6 +234,7 @@ def bulk_register(request):
         reader = csv.DictReader(decoded_file)
         errors = []
         for row in reader:
+            name = row.get("name")
             username = row.get("email")
             email = row.get("email")
             if not username or not email:
@@ -238,9 +242,9 @@ def bulk_register(request):
                 continue
             password = generate_password_based_on_email(email)
             try:
-                user = User.objects.create_user(username=username, email=email, password=password)
+                user = User.objects.create_user(first_name=name,username=username, email=email, password=password)
                 # Customize the email content
-                html_content = render_to_string("email_template.html", {"username": username, "password": password})
+                html_content = render_to_string("email_template.html", {"name":name,"username": username, "password": password})
                 send_mail(
                     subject="Your Account Credentials",
                     message="Please use a compatible email client to view your credentials.",
@@ -349,3 +353,32 @@ def reorder_submodule_video(request, course_id):
         return redirect("course_detail", course_id=course.id)
     submodules = Submodule.objects.filter(course=course).order_by("order")
     return render(request, "admin/reorder.html", {"course": course, "submodules": submodules})
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.hashers import check_password
+from django.contrib import messages
+@login_required
+def change_password(request):
+    if request.method == "POST":
+        current_password = request.POST.get('current_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+        
+        if not check_password(current_password, request.user.password):
+            messages.error(request, 'Current password is incorrect.')
+            return redirect('home')
+        
+        if new_password1 != new_password2:
+            messages.error(request, 'New passwords do not match.')
+            return redirect('home')
+        
+        if len(new_password1) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return redirect('home')
+        
+        request.user.set_password(new_password1)
+        request.user.save()
+        
+        messages.success(request, 'Password changed successfully.')
+        return redirect('home')
+    
+    return redirect('home')

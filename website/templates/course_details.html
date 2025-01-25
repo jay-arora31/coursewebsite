@@ -13,10 +13,7 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-6">
-                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xl">
-                        <span class="animate-pulse w-2 h-2 rounded-full bg-green-400"></span>
-                        <span class="text-sm text-white/90">{{ total_videos }} video lessons</span>
-                    </div>
+                  
                     
                     <h1 class="text-4xl sm:text-5xl font-bold text-white tracking-tight">{{ course.title }}</h1>
                     <p class="text-xl text-indigo-100 leading-relaxed max-w-2xl">{{ course.description }}</p>
@@ -200,6 +197,16 @@ function loadWistiaVideo(videoId, title, description) {
     
     document.getElementById('video-title').textContent = title;
     document.getElementById('video-description').textContent = description;
+    
+    // Attempt to reset video to start
+    window._wq = window._wq || [];
+    _wq.push({ 
+        id: videoId, 
+        onReady: function(video) {
+            video.time(0);  // Reset to beginning
+            video.play();   // Start playing
+        }
+    });
     
     // Scroll to video on mobile
     if (window.innerWidth < 1024) {
