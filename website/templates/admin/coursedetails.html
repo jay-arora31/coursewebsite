@@ -1,6 +1,7 @@
 {% extends "admin/adminbase.html" %}
 
 {% block title %}{{ course.title }}{% endblock %}
+{% load custom_filter %}
 
 {% block content %}
 <div class="course-detail max-w-6xl mx-auto px-6">
@@ -65,7 +66,7 @@
                                                 <div class="flex-1">
                                                     <h4 class="text-md font-semibold text-gray-800">{{ video.title }}</h4>
                                                     <div class="flex items-center mt-2 text-sm text-gray-600">
-                                                        <span>{{ video.duration }} seconds</span>
+                                                        <span>{{ video.duration|seconds_to_minutes }} minutes</span>
                                                         <a href="{{ video.video_url }}" class="ml-6 text-blue-600 hover:underline">Watch Video</a>
                                                     </div>
                                                 </div>
