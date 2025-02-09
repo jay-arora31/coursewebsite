@@ -15,7 +15,8 @@ import string
 
 def is_superuser(user):
     return user.is_superuser
-
+@login_required
+@user_passes_test(is_superuser)
 def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
