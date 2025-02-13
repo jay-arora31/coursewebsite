@@ -150,6 +150,12 @@
                 class="text-gray-200 hover:text-blue-300 font-medium transition-colors"
                 >Home</a
               >
+              {% if user.is_superuser %}
+              <a
+              href="/adminhome"
+              class="text-gray-200 hover:text-blue-300 font-medium transition-colors"
+              >Admin Home</a
+            >{% endif %}
             
               <a
                 href="{% url 'courses' %}"
@@ -443,111 +449,7 @@ Change Password
       });
     </script>
 
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal fixed inset-0 z-50">
-      <div class="flex items-center justify-center min-h-screen px-4">
-        <div
-          class="fixed inset-0 bg-black opacity-50"
-          onclick="closeModal('registerModal')"
-        ></div>
-        <div
-          class="relative bg-white rounded-xl shadow-2xl p-8 w-full max-w-md"
-        >
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Create Account</h2>
-            <button
-              onclick="closeModal('registerModal')"
-              class="text-gray-400 hover:text-gray-500"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-          <form method="post" action="{% url 'register' %}" class="space-y-6">
-            {% csrf_token %}
-            <div>
-              <label
-                for="reg-username"
-                class="block text-sm font-medium text-gray-700"
-                >Username</label
-              >
-              <input
-                type="text"
-                name="username"
-                id="reg-username"
-                required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700"
-                >Email</label
-              >
-              <input
-                type="email"
-                name="email"
-                id="email"
-                required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label
-                for="reg-password"
-                class="block text-sm font-medium text-gray-700"
-                >Password</label
-              >
-              <input
-                type="password"
-                name="password1"
-                id="reg-password"
-                required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label
-                for="password-confirm"
-                class="block text-sm font-medium text-gray-700"
-                >Confirm Password</label
-              >
-              <input
-                type="password"
-                name="password2"
-                id="password-confirm"
-                required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
-            >
 
-          </button>
-          </form>
-          <p class="mt-4 text-center text-sm text-gray-600">
-            <button
-              onclick="openModal('loginModal')"
-              class="font-medium text-blue-600 hover:text-blue-500"
-            >
-              Login
-            </button>
-          </p>
-        </div>
-      </div>
-    </div>
 
     <!-- Main Content -->
     <main>{% block content %}{% endblock %}</main>
@@ -569,11 +471,22 @@ Change Password
               <li>
                 <a href="/" class="text-gray-400 hover:text-blue-600">Home</a>
               </li>
+              {% if user.is_authenticated %}
+
               <li>
                 <a href="/courses" class="text-gray-400 hover:text-blue-600"
                   >Courses</a
                 >
               </li>
+              {% else %}
+
+              <li>
+             <a   href="javascript:void(0);"
+             class="text-gray-400 hover:text-blue-600"                onclick="handleButtonClick()">Courses</a
+                >
+              </li>
+              {% endif %}
+
               <li>
                 <a
                   href="https://skillignite.in/about-us/"
