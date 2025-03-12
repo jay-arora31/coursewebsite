@@ -383,3 +383,15 @@ def change_password(request):
         return redirect('home')
     
     return redirect('home')
+
+
+
+def privacy(request):
+    return  render(request,'privacy.html')
+
+def term(request):
+    return  render(request,'term.html')
+
+
+def refund(request):
+    return  render(request,'refund.html')
