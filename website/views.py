@@ -395,3 +395,13 @@ def term(request):
 
 def refund(request):
     return  render(request,'refund.html')
+
+
+
+def contact(request):
+    return  render(request,'contact.html')
+
+
+
+def about(request):
+    return  render(request,'about.html')

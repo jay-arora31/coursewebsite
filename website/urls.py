@@ -28,6 +28,8 @@ urlpatterns = [
     path("privacy/", privacy, name="privacy"),
     path("term/", term, name="term"),
     path("refund/", refund, name="refund"),
+    path("contact/", contact, name="contact"),
+    path("about/", about, name="about"),
     path(
         "submodule/<int:submodule_id>/delete/",
         delete_submodule,
